@@ -17,10 +17,6 @@ Quando a relação cruza o limite inferior, o papel final 4 está relativamente 
 - O monitor suspende o sinal de cada par se a cotação estiver velha ou se os horários dos dois papéis forem muito diferentes.
 - Se um par falhar, o outro ainda pode ser atualizado; a falha fica registrada em `pair_status`.
 
-## Painel histórico da Klabin
-
-O painel também mostra os fechamentos anuais de KLBN3 e KLBN4 desde 2006, na base atual após desdobramentos/bonificações. Os anos em que a discrepância percentual absoluta ultrapassou 50% continuam visíveis no gráfico, destacados em vermelho, mas ficam fora da média e da mediana de referência. A série histórica não reinveste dividendos.
-
 ## Configuração pelo iPhone
 
 1. Entre em https://github.com/ pelo Safari e crie/acesse sua conta.
