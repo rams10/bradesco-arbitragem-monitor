@@ -170,7 +170,14 @@ def main():
                 print(f"FALHA {pair['prefix'].upper()}: {exc}")
 
     if not successes:
-        raise RuntimeError("Nenhum par foi atualizado. " + " | ".join(errors))
+        # Fora do pregão, cotações antigas não devem gerar sinais nem falhar
+        # o workflow. Mantém os históricos anteriores intactos.
+        print(
+            "Nenhum par atualizado; históricos preservados. "
+            "Isso pode ocorrer com mercado fechado ou cotações antigas. "
+            + " | ".join(errors)
+        )
+        return
 
     DATA.parent.mkdir(parents=True, exist_ok=True)
     DATA.write_text(json.dumps(result, ensure_ascii=False, indent=2))
