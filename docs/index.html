@@ -26,26 +26,41 @@
 <div class="card chart"><div class="label">Histórico da relação SAPR4 / SAPR3</div><canvas id="saprChart"></canvas></div>
 <p class="note">Os limites iniciais da Sanepar (0,88 e 1,05) correspondem, aproximadamente, ao 1º e ao 3º quartis da relação anual SAPR4/SAPR3 entre 2017 e 2026. São parâmetros provisórios baseados em dez fechamentos anuais, ainda sem backtest diário. Abaixo do limite inferior, SAPR4 fica relativamente barata; acima do superior, SAPR4 fica relativamente cara.</p>
 
+<h2>Klabin · KLBN3 x KLBN4</h2>
+<div class="grid">
+<div class="card"><div class="label">KLBN3</div><div class="value" id="klbn3">—</div></div>
+<div class="card"><div class="label">KLBN4</div><div class="value" id="klbn4">—</div></div>
+<div class="card"><div class="label">Relação KLBN3 / KLBN4</div><div class="value" id="klbnRatio">—</div></div>
+</div>
+<div class="signal neutral" id="klbnSignal"><span class="pill" id="klbnZone">AGUARDANDO DADOS</span><h3 id="klbnSigtitle">Carregando histórico…</h3><p class="muted" id="klbnSigdesc">Limites: 0,95 e 1,05.</p><p class="muted" id="klbnUpdated"></p></div>
+<div class="card chart"><div class="label">Histórico da relação KLBN3 / KLBN4</div><canvas id="klbnChart"></canvas></div>
+<p class="note">A relação é KLBN3 ÷ KLBN4. Acima de 1,05, KLBN3 está mais de 5% cara que KLBN4; abaixo de 0,95, KLBN3 está mais de 5% barata. Os alertas do Telegram são enviados quando a relação cruza esses limites. O gráfico começa com as observações semanais já coletadas e passa a receber novas observações a cada execução de meia em meia hora.</p>
+
 <p class="foot">Consultas programadas aproximadamente a cada 30 minutos em dias úteis. O GitHub Actions pode atrasar a execução. A brapi gratuita tem atraso aproximado de 30 minutos e limite de 15 mil requisições por mês. O painel não envia ordens. Confira os preços executáveis no home broker, spread, custos, impostos, liquidez, proventos, direitos de cada classe e datas-com antes de qualquer troca.</p>
 </main><script>
 const money=x=>Number(x).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),fmt=x=>Number(x).toFixed(4).replace('.',',');
 function renderPair(d,cfg){
  const h=d[cfg.history]||[],q=h[h.length-1];
  const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value};
+ const dateLabel=x=>x.captured_at?new Date(x.captured_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):new Date(x.date+'T12:00:00').toLocaleDateString('pt-BR');
+ const quoteLabel=(stamp,fallback)=>stamp?new Date(stamp).toLocaleString('pt-BR'):fallback||'—';
  if(!q){put(cfg.ids.title,'Aguardando primeira coleta do par.');return}
  put(cfg.ids.p3,money(q[cfg.key3]));put(cfg.ids.p4,money(q[cfg.key4]));put(cfg.ids.ratio,fmt(q.ratio));
- put(cfg.ids.updated,'Coleta: '+new Date(q.captured_at).toLocaleString('pt-BR')+' · '+cfg.t3+': '+new Date(q.quote_time3).toLocaleString('pt-BR')+' · '+cfg.t4+': '+new Date(q.quote_time4).toLocaleString('pt-BR'));
+ put(cfg.ids.updated,'Coleta: '+quoteLabel(q.captured_at,q.date)+' · '+cfg.t3+': '+quoteLabel(q.quote_time3,q.date)+' · '+cfg.t4+': '+quoteLabel(q.quote_time4,q.date));
  const el=document.getElementById(cfg.ids.signal);
- if(q.ratio<=cfg.lower){el.className='signal good';put(cfg.ids.zone,'AVALIAR '+cfg.t4);put(cfg.ids.title,cfg.t4+' relativamente barata');put(cfg.ids.desc,'Relação no limite inferior ou abaixo de '+fmt(cfg.lower)+'. Avalie '+cfg.t3+' → '+cfg.t4+'.')}
- else if(q.ratio>=cfg.upper){el.className='signal bad';put(cfg.ids.zone,'AVALIAR '+cfg.t3);put(cfg.ids.title,cfg.t3+' relativamente barata');put(cfg.ids.desc,'Relação no limite superior ou acima de '+fmt(cfg.upper)+'. Avalie '+cfg.t4+' → '+cfg.t3+'.')}
+ const lowCheap=cfg.invertSignal?cfg.t3:cfg.t4,highCheap=cfg.invertSignal?cfg.t4:cfg.t3;
+ if(q.ratio<=cfg.lower){el.className='signal good';put(cfg.ids.zone,'AVALIAR '+lowCheap);put(cfg.ids.title,lowCheap+' relativamente barata');put(cfg.ids.desc,'Relação no limite inferior ou abaixo de '+fmt(cfg.lower)+'. Avalie '+highCheap+' → '+lowCheap+'.')}
+ else if(q.ratio>=cfg.upper){el.className='signal bad';put(cfg.ids.zone,'AVALIAR '+highCheap);put(cfg.ids.title,highCheap+' relativamente barata');put(cfg.ids.desc,'Relação no limite superior ou acima de '+fmt(cfg.upper)+'. Avalie '+lowCheap+' → '+highCheap+'.')}
  else{el.className='signal neutral';put(cfg.ids.zone,'ZONA NEUTRA');put(cfg.ids.title,'Aguardar');put(cfg.ids.desc,'Relação entre '+fmt(cfg.lower)+' e '+fmt(cfg.upper)+'.')}
  if(window[cfg.chart])window[cfg.chart].destroy();
- window[cfg.chart]=new Chart(document.getElementById(cfg.ids.canvas),{type:'line',data:{labels:h.map(x=>new Date(x.captured_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})),datasets:[{label:cfg.t4+' / '+cfg.t3,data:h.map(x=>x.ratio),borderColor:'#7eb6ff',pointRadius:0,tension:.2},{label:fmt(cfg.lower),data:h.map(()=>cfg.lower),borderColor:'#36c98f',borderDash:[5,5],pointRadius:0},{label:fmt(cfg.upper),data:h.map(()=>cfg.upper),borderColor:'#ff737d',borderDash:[5,5],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#bac8da'}}},scales:{x:{ticks:{color:'#9aabc2',maxTicksLimit:7},grid:{color:'#263750'}},y:{ticks:{color:'#9aabc2'},grid:{color:'#263750'}}}}});
+ const ratioLabel=cfg.invertSignal?cfg.t3+' / '+cfg.t4:cfg.t4+' / '+cfg.t3;
+ window[cfg.chart]=new Chart(document.getElementById(cfg.ids.canvas),{type:'line',data:{labels:h.map(dateLabel),datasets:[{label:ratioLabel,data:h.map(x=>x.ratio),borderColor:'#7eb6ff',pointRadius:0,tension:.2},{label:fmt(cfg.lower),data:h.map(()=>cfg.lower),borderColor:'#36c98f',borderDash:[5,5],pointRadius:0},{label:fmt(cfg.upper),data:h.map(()=>cfg.upper),borderColor:'#ff737d',borderDash:[5,5],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#bac8da'}}},scales:{x:{ticks:{color:'#9aabc2',maxTicksLimit:7},grid:{color:'#263750'}},y:{ticks:{color:'#9aabc2'},grid:{color:'#263750'}}}}});
 }
 async function load(){try{
  const r=await fetch('./data.json?ts='+Date.now());if(!r.ok)throw Error('Aguardando primeira execução do monitor.');const d=await r.json();
  renderPair(d,{history:'history',key3:'bbdc3',key4:'bbdc4',t3:'BBDC3',t4:'BBDC4',lower:1.07,upper:1.13,chart:'monitorChart',ids:{p3:'p3',p4:'p4',ratio:'ratio',signal:'signal',zone:'zone',title:'sigtitle',desc:'sigdesc',updated:'updated',canvas:'chart'}});
  renderPair(d,{history:'sapr_history',key3:'sapr3',key4:'sapr4',t3:'SAPR3',t4:'SAPR4',lower:.88,upper:1.05,chart:'saprMonitorChart',ids:{p3:'sapr3',p4:'sapr4',ratio:'saprRatio',signal:'saprSignal',zone:'saprZone',title:'saprSigtitle',desc:'saprSigdesc',updated:'saprUpdated',canvas:'saprChart'}});
+ renderPair(d,{history:'klbn_history',key3:'klbn3',key4:'klbn4',t3:'KLBN3',t4:'KLBN4',lower:.95,upper:1.05,invertSignal:true,chart:'klbnMonitorChart',ids:{p3:'klbn3',p4:'klbn4',ratio:'klbnRatio',signal:'klbnSignal',zone:'klbnZone',title:'klbnSigtitle',desc:'klbnSigdesc',updated:'klbnUpdated',canvas:'klbnChart'}});
  }catch(e){document.getElementById('sigtitle').textContent=e.message}}
 load();setInterval(load,60000);
 </script></body></html>
