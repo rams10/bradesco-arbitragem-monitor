@@ -1,8 +1,133 @@
 {
   "source": "brapi.dev",
-  "updated_at": null,
+  "updated_at": "2026-11-21T22:40:08Z",
   "frequency": "weekly",
-  "threshold_pct": 5,
-  "history": [],
-  "last_run": null
+  "weekly_method": "last available trading close in each ISO week",
+  "initial_history_limit": "3 months on the free brapi plan; the stored weekly series accumulates over time",
+  "threshold_pct": 5.0,
+  "history": [
+    {
+      "week": "2026-W35",
+      "date": "2026-08-28",
+      "klbn3": 3.85,
+      "klbn4": 3.75,
+      "spread_pct": 2.6667,
+      "klbn3_date": "2026-08-28",
+      "klbn4_date": "2026-08-28"
+    },
+    {
+      "week": "2026-W36",
+      "date": "2026-09-04",
+      "klbn3": 4.03,
+      "klbn4": 3.85,
+      "spread_pct": 4.6753,
+      "klbn3_date": "2026-09-04",
+      "klbn4_date": "2026-09-04"
+    },
+    {
+      "week": "2026-W37",
+      "date": "2026-09-11",
+      "klbn3": 4.08,
+      "klbn4": 3.85,
+      "spread_pct": 5.974,
+      "klbn3_date": "2026-09-11",
+      "klbn4_date": "2026-09-11"
+    },
+    {
+      "week": "2026-W38",
+      "date": "2026-09-18",
+      "klbn3": 4.05,
+      "klbn4": 3.86,
+      "spread_pct": 4.9223,
+      "klbn3_date": "2026-09-18",
+      "klbn4_date": "2026-09-18"
+    },
+    {
+      "week": "2026-W39",
+      "date": "2026-09-25",
+      "klbn3": 3.79,
+      "klbn4": 3.58,
+      "spread_pct": 5.8659,
+      "klbn3_date": "2026-09-25",
+      "klbn4_date": "2026-09-25"
+    },
+    {
+      "week": "2026-W40",
+      "date": "2026-10-02",
+      "klbn3": 3.8,
+      "klbn4": 3.69,
+      "spread_pct": 2.981,
+      "klbn3_date": "2026-10-02",
+      "klbn4_date": "2026-10-02"
+    },
+    {
+      "week": "2026-W41",
+      "date": "2026-10-09",
+      "klbn3": 3.74,
+      "klbn4": 3.63,
+      "spread_pct": 3.0303,
+      "klbn3_date": "2026-10-09",
+      "klbn4_date": "2026-10-09"
+    },
+    {
+      "week": "2026-W42",
+      "date": "2026-10-16",
+      "klbn3": 3.7,
+      "klbn4": 3.61,
+      "spread_pct": 2.4931,
+      "klbn3_date": "2026-10-16",
+      "klbn4_date": "2026-10-16"
+    },
+    {
+      "week": "2026-W43",
+      "date": "2026-10-23",
+      "klbn3": 3.7,
+      "klbn4": 3.62,
+      "spread_pct": 2.2099,
+      "klbn3_date": "2026-10-23",
+      "klbn4_date": "2026-10-23"
+    },
+    {
+      "week": "2026-W44",
+      "date": "2026-10-30",
+      "klbn3": 3.56,
+      "klbn4": 3.41,
+      "spread_pct": 4.3988,
+      "klbn3_date": "2026-10-30",
+      "klbn4_date": "2026-10-30"
+    },
+    {
+      "week": "2026-W45",
+      "date": "2026-11-06",
+      "klbn3": 3.64,
+      "klbn4": 3.49,
+      "spread_pct": 4.298,
+      "klbn3_date": "2026-11-06",
+      "klbn4_date": "2026-11-06"
+    },
+    {
+      "week": "2026-W46",
+      "date": "2026-11-13",
+      "klbn3": 3.59,
+      "klbn4": 3.46,
+      "spread_pct": 3.7572,
+      "klbn3_date": "2026-11-13",
+      "klbn4_date": "2026-11-13"
+    },
+    {
+      "week": "2026-W47",
+      "date": "2026-11-19",
+      "klbn3": 3.42,
+      "klbn4": 3.34,
+      "spread_pct": 2.3952,
+      "klbn3_date": "2026-11-19",
+      "klbn4_date": "2026-11-19"
+    }
+  ],
+  "last_run": {
+    "weeks_received": 13,
+    "total_weeks": 13,
+    "latest_week": "2026-W47",
+    "latest_date": "2026-11-19"
+  }
 }
