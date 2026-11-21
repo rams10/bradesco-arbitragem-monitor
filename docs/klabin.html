@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827"><title>Klabin · comparação KLBN3 x KLBN4</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d30;--line:#263750;--txt:#eef4ff;--muted:#9aabc2;--blue:#7eb6ff;--green:#36c98f;--red:#ff737d;--amber:#f2bd58}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,Arial}
+main{max-width:1050px;margin:auto;padding:24px 16px}h1{font-size:clamp(24px,5vw,34px);margin:0}h2{font-size:20px;margin:26px 0 8px}
+.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px}
+.label{font-size:12px;color:var(--muted);text-transform:uppercase}.value{font-size:26px;font-weight:750;margin-top:8px;font-variant-numeric:tabular-nums}
+.chart{margin-top:14px;min-height:320px}.chart canvas{max-height:300px}.pill{display:inline-block;padding:5px 10px;border-radius:99px;background:#263750;color:var(--muted);font-size:12px}
+.signal{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}.positive{border-color:#8d414a}.negative{border-color:#237653}.neutral{border-color:#8b6b30}
+.note{font-size:13px;line-height:1.55;color:var(--muted);margin-top:12px}.foot{font-size:12px;line-height:1.5;color:var(--muted);margin-top:22px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th,td{text-align:right;padding:9px 7px;border-bottom:1px solid var(--line);white-space:nowrap}th:first-child,td:first-child{text-align:left}
+tbody tr.alert-pos{background:rgba(255,115,125,.08)}tbody tr.alert-neg{background:rgba(54,201,143,.08)}
+.badge{font-weight:700}.pos{color:var(--red)}.neg{color:var(--green)}.empty{padding:22px;text-align:center;color:var(--muted)}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.value{font-size:23px}.chart{min-height:280px;overflow:hidden}th,td{padding:7px 5px;font-size:12px}}
+</style>
+</head>
+<body><main>
+<h1>Klabin · KLBN3 x KLBN4</h1>
+<p class="muted">Acompanhamento independente · observação semanal · comparação de preços relativos</p>
+<div class="grid">
+ <div class="card"><div class="label">Último fechamento KLBN3</div><div class="value" id="p3">—</div></div>
+ <div class="card"><div class="label">Último fechamento KLBN4</div><div class="value" id="p4">—</div></div>
+ <div class="card"><div class="label">Diferença KLBN3 sobre KLBN4</div><div class="value" id="spread">—</div></div>
+</div>
+<div class="signal neutral" id="status"><span class="pill" id="zone">CARREGANDO</span><h3 id="headline">Carregando histórico semanal…</h3><p class="muted" id="description"></p><p class="muted" id="updated"></p></div>
+<h2>1. Preços semanais</h2>
+<div class="card chart"><canvas id="prices"></canvas></div>
+<h2>2. Diferença relativa entre as classes</h2>
+<div class="card chart"><canvas id="spreadChart"></canvas></div>
+<p class="note">A diferença é calculada como (KLBN3 ÷ KLBN4 − 1) × 100. Acima de +5%, KLBN3 está mais de 5% cara que KLBN4. Abaixo de −5%, KLBN3 está mais de 5% barata que KLBN4. As linhas tracejadas marcam os limites de +5% e −5%.</p>
+<h2>Semanas fora da faixa de ±5%</h2>
+<div class="card" style="overflow-x:auto"><table><thead><tr><th>Semana</th><th>KLBN3</th><th>KLBN4</th><th>Diferença</th><th>Leitura</th></tr></thead><tbody id="outliers"></tbody></table><div id="noOutliers" class="empty" hidden>Nenhuma semana acima de +5% ou abaixo de −5% no histórico carregado.</div></div>
+<p class="note" id="method"></p>
+<p class="foot">Histórico importado: até 3 meses na primeira consulta quando utilizada a modalidade gratuita da brapi. A partir daí, a série fica acumulada e recebe uma nova observação semanal, normalmente após o fechamento de sexta-feira. Os preços são fechamentos nominais, sem reinvestimento de dividendos. Compare preços negociáveis no home broker antes de operar; diferença estatística não garante convergência.</p>
+</main>
+<script>
+const money=x=>Number(x).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const pct=x=>(x>0?'+':'')+Number(x).toFixed(2).replace('.',',')+'%';
+const fmtDate=s=>new Date(s+'T12:00:00').toLocaleDateString('pt-BR');
+const axis={ticks:{color:'#9aabc2'},grid:{color:'#263750'}};
+let priceChart=null,spreadPlot=null;
+async function load(){
+ try{
+  const res=await fetch('./klabin-data.json?ts='+Date.now());if(!res.ok)throw Error('A coleta semanal ainda não gerou dados.');
+  const d=await res.json(),h=d.history||[];if(!h.length)throw Error('Aguardando a primeira coleta semanal.');
+  const q=h[h.length-1],spread=Number(q.spread_pct);
+  document.getElementById('p3').textContent=money(q.klbn3);document.getElementById('p4').textContent=money(q.klbn4);
+  const spr=document.getElementById('spread');spr.textContent=pct(spread);spr.style.color=spread>5?'#ff737d':spread< -5?'#36c98f':'#eef4ff';
+  const st=document.getElementById('status'),zone=document.getElementById('zone');
+  if(spread>5){st.className='signal positive';zone.textContent='KLBN3 COM PRÊMIO > 5%';document.getElementById('headline').textContent='KLBN3 relativamente mais cara';document.getElementById('description').textContent='Diferença acima de +5%. KLBN4 está relativamente mais barata na comparação de preço.'}
+  else if(spread< -5){st.className='signal negative';zone.textContent='KLBN3 COM DESCONTO > 5%';document.getElementById('headline').textContent='KLBN3 relativamente mais barata';document.getElementById('description').textContent='Diferença abaixo de −5%. KLBN3 está relativamente mais barata que KLBN4.'}
+  else{st.className='signal neutral';zone.textContent='DENTRO DA FAIXA';document.getElementById('headline').textContent='Diferença inferior a 5% em ambos os sentidos';document.getElementById('description').textContent='Sem desvio acima do limite definido.'}
+  document.getElementById('updated').textContent='Última observação: '+fmtDate(q.date)+' · semana '+q.week+' · atualização do arquivo: '+(d.updated_at||'—');
+  if(priceChart)priceChart.destroy();
+  priceChart=new Chart(document.getElementById('prices'),{type:'line',data:{labels:h.map(x=>fmtDate(x.date)),datasets:[
+   {label:'KLBN3',data:h.map(x=>x.klbn3),borderColor:'#7eb6ff',backgroundColor:'#7eb6ff',pointRadius:2,tension:.18},
+   {label:'KLBN4',data:h.map(x=>x.klbn4),borderColor:'#36c98f',backgroundColor:'#36c98f',pointRadius:2,tension:.18}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#bac8da'}}},scales:{x:axis,y:{...axis,title:{display:true,text:'Preço de fechamento (R$)',color:'#9aabc2'}}}}});
+  if(spreadPlot)spreadPlot.destroy();
+  spreadPlot=new Chart(document.getElementById('spreadChart'),{type:'line',data:{labels:h.map(x=>fmtDate(x.date)),datasets:[
+   {label:'Prêmio/desconto KLBN3 vs KLBN4',data:h.map(x=>x.spread_pct),borderColor:'#f2bd58',pointRadius:h.map(x=>Math.abs(x.spread_pct)>5?5:2),pointBackgroundColor:h.map(x=>x.spread_pct>5?'#ff737d':x.spread_pct< -5?'#36c98f':'#f2bd58'),tension:.15},
+   {label:'+5%',data:h.map(()=>5),borderColor:'#ff737d',borderDash:[6,5],pointRadius:0},
+   {label:'−5%',data:h.map(()=>-5),borderColor:'#36c98f',borderDash:[6,5],pointRadius:0},
+   {label:'0%',data:h.map(()=>0),borderColor:'#9aabc2',borderDash:[2,4],pointRadius:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#bac8da'}}},scales:{x:axis,y:{...axis,title:{display:true,text:'KLBN3 sobre KLBN4 (%)',color:'#9aabc2'}}}}});
+  const out=h.filter(x=>Math.abs(x.spread_pct)>5).slice().reverse();
+  const tbody=document.getElementById('outliers'),empty=document.getElementById('noOutliers');tbody.innerHTML='';
+  for(const x of out){const tr=document.createElement('tr');tr.className=x.spread_pct>5?'alert-pos':'alert-neg';const vals=[x.week+' · '+fmtDate(x.date),money(x.klbn3),money(x.klbn4),pct(x.spread_pct),x.spread_pct>5?'KLBN3 mais cara':'KLBN3 mais barata'];for(const v of vals){const td=document.createElement('td');td.textContent=v;tr.appendChild(td)}tbody.appendChild(tr)}
+  empty.hidden=out.length>0;
+  document.getElementById('method').textContent='Fonte: '+(d.source||'brapi.dev')+'. Frequência: semanal. '+h.length+' semanas acumuladas. Os fechamentos das duas classes são escolhidos pelo último pregão disponível na respectiva semana ISO.';
+ }catch(e){document.getElementById('headline').textContent=e.message;document.getElementById('zone').textContent='AGUARDANDO DADOS'}
+}
+load();setInterval(load,60000);
+</script></body></html>
