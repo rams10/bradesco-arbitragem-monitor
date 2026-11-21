@@ -1,0 +1,49 @@
+name: Coleta semanal KLBN3 e KLBN4
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "klabin_weekly.py"
+      - ".github/workflows/klabin-weekly.yml"
+      - "docs/klabin.html"
+  schedule:
+    - cron: "30 21 * * 5" # Sexta-feira, 18h30 de Brasília (após o fechamento)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: klabin-weekly
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Coletar preços e montar semanas
+        env:
+          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
+        run: python klabin_weekly.py
+
+      - name: Salvar histórico semanal
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+users.noreply.github.com"
+          git add docs/klabin-data.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Atualiza histórico semanal KLBN3/KLBN4"
+            git push
+          else
+            echo "Histórico semanal sem alterações."
+          fi
