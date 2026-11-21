@@ -1,18 +1,61 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101827"><title>Bradesco Arbitragem Monitor</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101827"><title>Monitor de alternância entre classes</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#0b1220;--panel:#121d30;--line:#263750;--txt:#eef4ff;--muted:#9aabc2;--green:#36c98f;--red:#ff737d;--amber:#f2bd58}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,Arial}main{max-width:980px;margin:auto;padding:24px 16px}h1{font-size:clamp(24px,5vw,34px);margin:0}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px}.label{font-size:12px;color:var(--muted);text-transform:uppercase}.value{font-size:28px;font-weight:750;margin-top:8px;font-variant-numeric:tabular-nums}.signal{margin-top:14px;padding:18px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}.good{border-color:#237653}.bad{border-color:#8d414a}.neutral{border-color:#8b6b30}.pill{display:inline-block;padding:6px 10px;border-radius:99px;background:#263750;color:var(--muted);font-size:12px}.chart{margin-top:14px;min-height:300px}.chart canvas{max-height:270px}.foot{font-size:12px;line-height:1.5;color:var(--muted);margin-top:18px}@media(max-width:600px){.grid{grid-template-columns:1fr}.value{font-size:25px}}
-</style></head><body><main><h1>Bradesco Arbitragem Monitor</h1><p class="muted">Monitor de preço relativo · BBDC3 / BBDC4</p>
-<div class="grid"><div class="card"><div class="label">BBDC3</div><div class="value" id="p3">—</div></div><div class="card"><div class="label">BBDC4</div><div class="value" id="p4">—</div></div><div class="card"><div class="label">Relação BBDC4 / BBDC3</div><div class="value" id="ratio">—</div></div></div>
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,Arial}main{max-width:1050px;margin:auto;padding:24px 16px}h1{font-size:clamp(24px,5vw,34px);margin:0}h2{font-size:20px;margin:30px 0 8px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px}.label{font-size:12px;color:var(--muted);text-transform:uppercase}.value{font-size:28px;font-weight:750;margin-top:8px;font-variant-numeric:tabular-nums}.signal{margin-top:14px;padding:18px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}.good{border-color:#237653}.bad{border-color:#8d414a}.neutral{border-color:#8b6b30}.pill{display:inline-block;padding:6px 10px;border-radius:99px;background:#263750;color:var(--muted);font-size:12px}.chart{margin-top:14px;min-height:300px}.chart canvas{max-height:270px}.foot{font-size:12px;line-height:1.55;color:var(--muted);margin-top:18px}.note{font-size:13px;line-height:1.55;color:var(--muted);margin:12px 2px 0}.links a{color:#9fc7ff}@media(max-width:600px){.grid{grid-template-columns:1fr}.value{font-size:25px}}
+</style></head><body><main>
+<h1>Monitor de alternância entre classes</h1><p class="muted">Painel web · Bradesco (BBDC3/BBDC4) e Sanepar (SAPR3/SAPR4)</p>
+
+<h2>Bradesco · BBDC3 x BBDC4</h2>
+<div class="grid">
+<div class="card"><div class="label">BBDC3</div><div class="value" id="p3">—</div></div>
+<div class="card"><div class="label">BBDC4</div><div class="value" id="p4">—</div></div>
+<div class="card"><div class="label">Relação BBDC4 / BBDC3</div><div class="value" id="ratio">—</div></div>
+</div>
 <div class="signal neutral" id="signal"><span class="pill" id="zone">AGUARDANDO DADOS</span><h3 id="sigtitle">Carregando última coleta…</h3><p class="muted" id="sigdesc">Limites: 1,07 e 1,13.</p><p class="muted" id="updated"></p></div>
-<div class="card chart"><div class="label">Histórico da relação</div><canvas id="chart"></canvas></div>
-<p class="foot">Consultas programadas aproximadamente a cada 30 minutos em dias úteis. O GitHub Actions pode atrasar a execução. A brapi gratuita tem delay aproximado de 30 minutos. O painel não envia ordens. Confira os preços no home broker, spread, custos, impostos, liquidez, proventos e datas-com.</p>
+<div class="card chart"><div class="label">Histórico da relação BBDC4 / BBDC3</div><canvas id="chart"></canvas></div>
+
+<h2>Sanepar · SAPR3 x SAPR4</h2>
+<div class="grid">
+<div class="card"><div class="label">SAPR3</div><div class="value" id="sapr3">—</div></div>
+<div class="card"><div class="label">SAPR4</div><div class="value" id="sapr4">—</div></div>
+<div class="card"><div class="label">Relação SAPR4 / SAPR3</div><div class="value" id="saprRatio">—</div></div>
+</div>
+<div class="signal neutral" id="saprSignal"><span class="pill" id="saprZone">AGUARDANDO DADOS</span><h3 id="saprSigtitle">Carregando primeira coleta…</h3><p class="muted" id="saprSigdesc">Limites iniciais: 0,88 e 1,05.</p><p class="muted" id="saprUpdated"></p></div>
+<div class="card chart"><div class="label">Histórico da relação SAPR4 / SAPR3</div><canvas id="saprChart"></canvas></div>
+<p class="note">Os limites iniciais da Sanepar (0,88 e 1,05) correspondem, aproximadamente, ao 1º e ao 3º quartis da relação anual SAPR4/SAPR3 entre 2017 e 2026. São parâmetros provisórios baseados em dez fechamentos anuais, ainda sem backtest diário. Abaixo do limite inferior, SAPR4 fica relativamente barata; acima do superior, SAPR4 fica relativamente cara.</p>
+
+<h2>Klabin · histórico de preços KLBN3 x KLBN4</h2>
+<div class="card chart"><div class="label">Fechamento anual em R$ · base atual de ações</div><canvas id="klbnChart"></canvas></div>
+<p class="note">Todos os anos permanecem no gráfico. Os pontos vermelhos indicam anos em que a diferença absoluta entre KLBN3 e KLBN4 superou 50%; esses anos não entram no cálculo da média/mediana, mas não foram apagados da série. Nos 16 anos restantes, o prêmio médio da KLBN3 foi de 9,27% e a mediana de 3,42%. Anos destacados: 2007 (+167,7%), 2015 (+126,3%), 2016 (+115,8%), 2017 (+59,7%) e 2018 (+53,7%). Preços ajustados para desdobramentos/bonificações até a base atual, sem reinvestimento de dividendos; 2026 até 19/11.</p>
+<p class="note links">Fonte histórica: <a href="https://www.cotab3.com.br/cotacao/KLBN3" target="_blank" rel="noopener">KLBN3</a> e <a href="https://www.cotab3.com.br/cotacao/KLBN4F" target="_blank" rel="noopener">KLBN4 (série consultada como KLBN4F)</a>, Cota B3.</p>
+
+<p class="foot">Consultas programadas aproximadamente a cada 30 minutos em dias úteis. O GitHub Actions pode atrasar a execução. A brapi gratuita tem atraso aproximado de 30 minutos e limite de 15 mil requisições por mês. O painel não envia ordens. Confira os preços executáveis no home broker, spread, custos, impostos, liquidez, proventos, direitos de cada classe e datas-com antes de qualquer troca.</p>
 </main><script>
 const money=x=>Number(x).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),fmt=x=>Number(x).toFixed(4).replace('.',',');
-async function load(){try{const r=await fetch('./data.json?ts='+Date.now());if(!r.ok)throw Error('Aguardando primeira execução do monitor.');const d=await r.json(),h=d.history||[];if(!h.length)throw Error('Aguardando primeira execução do monitor.');const q=h[h.length-1];document.getElementById('p3').textContent=money(q.bbdc3);document.getElementById('p4').textContent=money(q.bbdc4);document.getElementById('ratio').textContent=fmt(q.ratio);document.getElementById('updated').textContent='Coleta: '+new Date(q.captured_at).toLocaleString('pt-BR')+' · Cotação BBDC3: '+new Date(q.quote_time3).toLocaleString('pt-BR')+' · BBDC4: '+new Date(q.quote_time4).toLocaleString('pt-BR');let el=document.getElementById('signal');if(q.ratio<=1.07){el.className='signal good';document.getElementById('zone').textContent='AVALIAR BBDC4';document.getElementById('sigtitle').textContent='BBDC4 relativamente barata';document.getElementById('sigdesc').textContent='Relação no limite inferior ou abaixo de 1,07.'}else if(q.ratio>=1.13){el.className='signal bad';document.getElementById('zone').textContent='AVALIAR BBDC3';document.getElementById('sigtitle').textContent='BBDC3 relativamente barata';document.getElementById('sigdesc').textContent='Relação no limite superior ou acima de 1,13.'}else{el.className='signal neutral';document.getElementById('zone').textContent='ZONA NEUTRA';document.getElementById('sigtitle').textContent='Aguardar';document.getElementById('sigdesc').textContent='Relação entre 1,07 e 1,13.'}
-if(window.monitorChart)window.monitorChart.destroy();window.monitorChart=new Chart(document.getElementById('chart'),{type:'line',data:{labels:h.map(x=>new Date(x.captured_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})),datasets:[{label:'BBDC4 / BBDC3',data:h.map(x=>x.ratio),borderColor:'#7eb6ff',pointRadius:0,tension:.2},{label:'1,07',data:h.map(()=>1.07),borderColor:'#36c98f',borderDash:[5,5],pointRadius:0},{label:'1,13',data:h.map(()=>1.13),borderColor:'#ff737d',borderDash:[5,5],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#bac8da'}}},scales:{x:{ticks:{color:'#9aabc2',maxTicksLimit:7},grid:{color:'#263750'}},y:{ticks:{color:'#9aabc2'},grid:{color:'#263750'}}}}});
-}catch(e){document.getElementById('sigtitle').textContent=e.message}}
+function renderPair(d,cfg){
+ const h=d[cfg.history]||[],q=h[h.length-1];
+ const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value};
+ if(!q){put(cfg.ids.title,'Aguardando primeira coleta do par.');return}
+ put(cfg.ids.p3,money(q[cfg.key3]));put(cfg.ids.p4,money(q[cfg.key4]));put(cfg.ids.ratio,fmt(q.ratio));
+ put(cfg.ids.updated,'Coleta: '+new Date(q.captured_at).toLocaleString('pt-BR')+' · '+cfg.t3+': '+new Date(q.quote_time3).toLocaleString('pt-BR')+' · '+cfg.t4+': '+new Date(q.quote_time4).toLocaleString('pt-BR'));
+ const el=document.getElementById(cfg.ids.signal);
+ if(q.ratio<=cfg.lower){el.className='signal good';put(cfg.ids.zone,'AVALIAR '+cfg.t4);put(cfg.ids.title,cfg.t4+' relativamente barata');put(cfg.ids.desc,'Relação no limite inferior ou abaixo de '+fmt(cfg.lower)+'. Avalie '+cfg.t3+' → '+cfg.t4+'.')}
+ else if(q.ratio>=cfg.upper){el.className='signal bad';put(cfg.ids.zone,'AVALIAR '+cfg.t3);put(cfg.ids.title,cfg.t3+' relativamente barata');put(cfg.ids.desc,'Relação no limite superior ou acima de '+fmt(cfg.upper)+'. Avalie '+cfg.t4+' → '+cfg.t3+'.')}
+ else{el.className='signal neutral';put(cfg.ids.zone,'ZONA NEUTRA');put(cfg.ids.title,'Aguardar');put(cfg.ids.desc,'Relação entre '+fmt(cfg.lower)+' e '+fmt(cfg.upper)+'.')}
+ if(window[cfg.chart])window[cfg.chart].destroy();
+ window[cfg.chart]=new Chart(document.getElementById(cfg.ids.canvas),{type:'line',data:{labels:h.map(x=>new Date(x.captured_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})),datasets:[{label:cfg.t4+' / '+cfg.t3,data:h.map(x=>x.ratio),borderColor:'#7eb6ff',pointRadius:0,tension:.2},{label:fmt(cfg.lower),data:h.map(()=>cfg.lower),borderColor:'#36c98f',borderDash:[5,5],pointRadius:0},{label:fmt(cfg.upper),data:h.map(()=>cfg.upper),borderColor:'#ff737d',borderDash:[5,5],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#bac8da'}}},scales:{x:{ticks:{color:'#9aabc2',maxTicksLimit:7},grid:{color:'#263750'}},y:{ticks:{color:'#9aabc2'},grid:{color:'#263750'}}}}});
+}
+async function load(){try{
+ const r=await fetch('./data.json?ts='+Date.now());if(!r.ok)throw Error('Aguardando primeira execução do monitor.');const d=await r.json();
+ renderPair(d,{history:'history',key3:'bbdc3',key4:'bbdc4',t3:'BBDC3',t4:'BBDC4',lower:1.07,upper:1.13,chart:'monitorChart',ids:{p3:'p3',p4:'p4',ratio:'ratio',signal:'signal',zone:'zone',title:'sigtitle',desc:'sigdesc',updated:'updated',canvas:'chart'}});
+ renderPair(d,{history:'sapr_history',key3:'sapr3',key4:'sapr4',t3:'SAPR3',t4:'SAPR4',lower:.88,upper:1.05,chart:'saprMonitorChart',ids:{p3:'sapr3',p4:'sapr4',ratio:'saprRatio',signal:'saprSignal',zone:'saprZone',title:'saprSigtitle',desc:'saprSigdesc',updated:'saprUpdated',canvas:'saprChart'}});
+ }catch(e){document.getElementById('sigtitle').textContent=e.message}}
+const klbnYears=[2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
+const klbn3=[1.58,3.56,.99,1.07,1.23,1.38,2.44,2.18,3.25,8.42,6.00,5.00,4.35,4.22,5.34,5.57,3.99,4.38,4.92,3.81,3.42];
+const klbn4=[1.06,1.33,.66,1.01,1.19,1.52,2.52,2.39,2.87,3.72,2.78,3.13,2.83,3.54,5.16,4.98,3.96,4.39,4.51,3.76,3.34];
+const klbnOutliers=new Set([2007,2015,2016,2017,2018]);
+new Chart(document.getElementById('klbnChart'),{type:'line',data:{labels:klbnYears,datasets:[{label:'KLBN3',data:klbn3,borderColor:'#7eb6ff',pointRadius:klbnYears.map(y=>klbnOutliers.has(y)?4:2),pointBackgroundColor:klbnYears.map(y=>klbnOutliers.has(y)?'#ff737d':'#7eb6ff'),tension:.18},{label:'KLBN4',data:klbn4,borderColor:'#36c98f',pointRadius:klbnYears.map(y=>klbnOutliers.has(y)?4:2),pointBackgroundColor:klbnYears.map(y=>klbnOutliers.has(y)?'#ff737d':'#36c98f'),tension:.18}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#bac8da'}}},scales:{x:{ticks:{color:'#9aabc2',maxTicksLimit:11},grid:{color:'#263750'}},y:{title:{display:true,text:'Preço em R$',color:'#9aabc2'},ticks:{color:'#9aabc2'},grid:{color:'#263750'}}}}});
 load();setInterval(load,60000);
 </script></body></html>
