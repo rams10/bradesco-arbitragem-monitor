@@ -13,6 +13,8 @@ PAIRS = [
         "prefix": "bbdc",
         "ticker3": "BBDC3",
         "ticker4": "BBDC4",
+        "ratio_numerator": "4",
+        "ratio_label": "BBDC4 / BBDC3",
         "lower": 1.07,
         "upper": 1.13,
     },
@@ -22,9 +24,23 @@ PAIRS = [
         "prefix": "sapr",
         "ticker3": "SAPR3",
         "ticker4": "SAPR4",
+        "ratio_numerator": "4",
+        "ratio_label": "SAPR4 / SAPR3",
         # Starting thresholds: approximate 1st/3rd quartiles of annual SAPR4/SAPR3
-        # closes for 2017-2026. These are provisional until a daily backtest is run.
+        # closes for 2017-2026. Provisional until a daily backtest is run.
         "lower": 0.88,
+        "upper": 1.05,
+    },
+    {
+        "history_key": "klbn_history",
+        "signal_key": "klbn_last_signal",
+        "prefix": "klbn",
+        "ticker3": "KLBN3",
+        "ticker4": "KLBN4",
+        "ratio_numerator": "3",
+        "ratio_label": "KLBN3 / KLBN4",
+        # The requested ±5% relative-price alert band.
+        "lower": 0.95,
         "upper": 1.05,
     },
 ]
@@ -58,22 +74,31 @@ def collect_pair(client, old, pair, now):
             f"Horários das cotações de {ticker3} e {ticker4} muito diferentes."
         )
 
-    ratio = p4 / p3
+    if pair["ratio_numerator"] == "4":
+        numerator, denominator = p4, p3
+        numerator_ticker, denominator_ticker = ticker4, ticker3
+    else:
+        numerator, denominator = p3, p4
+        numerator_ticker, denominator_ticker = ticker3, ticker4
+    ratio = numerator / denominator
+
     history = old.get(pair["history_key"], [])
     previous = history[-1]["ratio"] if history else None
     signal = None
     if previous is not None:
         if previous > pair["lower"] and ratio <= pair["lower"]:
             signal = (
-                f"{ticker4} relativamente barata",
-                f"A relação {ticker4}/{ticker3} caiu para {ratio:.4f} "
-                f"(limite {pair['lower']:.2f}). Avalie {ticker3} → {ticker4}.",
+                f"{numerator_ticker} relativamente barata",
+                f"A relação {pair['ratio_label']} caiu para {ratio:.4f} "
+                f"(limite {pair['lower']:.2f}). Avalie "
+                f"{denominator_ticker} → {numerator_ticker}.",
             )
         elif previous < pair["upper"] and ratio >= pair["upper"]:
             signal = (
-                f"{ticker3} relativamente barata",
-                f"A relação {ticker4}/{ticker3} subiu para {ratio:.4f} "
-                f"(limite {pair['upper']:.2f}). Avalie {ticker4} → {ticker3}.",
+                f"{denominator_ticker} relativamente barata",
+                f"A relação {pair['ratio_label']} subiu para {ratio:.4f} "
+                f"(limite {pair['upper']:.2f}). Avalie "
+                f"{numerator_ticker} → {denominator_ticker}.",
             )
 
     record = {
@@ -81,16 +106,21 @@ def collect_pair(client, old, pair, now):
         f"{pair['prefix']}3": p3,
         f"{pair['prefix']}4": p4,
         "ratio": ratio,
+        "ratio_label": pair["ratio_label"],
         "quote_time3": t3,
         "quote_time4": t4,
     }
     history.append(record)
-    return history[-1000:], signal, record
+    return history[-2000:], signal, record
 
 
 def main():
     now = datetime.datetime.now(TZ)
-    old = {"history": [], "sapr_history": []}
+    old = {
+        "history": [],
+        "sapr_history": [],
+        "klbn_history": [],
+    }
     if DATA.exists():
         try:
             old = json.loads(DATA.read_text())
@@ -100,14 +130,17 @@ def main():
     result = {
         "history": old.get("history", []),
         "sapr_history": old.get("sapr_history", []),
+        "klbn_history": old.get("klbn_history", []),
         "last_signal": old.get("last_signal"),
         "sapr_last_signal": old.get("sapr_last_signal"),
+        "klbn_last_signal": old.get("klbn_last_signal"),
         "pair_status": old.get("pair_status", {}),
     }
     alerts, successes, errors = [], [], []
     headers = {"Authorization": f"Bearer {os.environ['BRAPI_TOKEN']}"}
 
-    # Plano Gratuito: um ticker por chamada; quatro chamadas por coleta (dois pares).
+    # Plano gratuito: um ticker por chamada. São seis chamadas por coleta:
+    # BBDC3/4, SAPR3/4 e KLBN3/4.
     with httpx.Client(timeout=25, headers=headers) as client:
         for pair in PAIRS:
             try:
@@ -125,7 +158,7 @@ def main():
                 print(
                     f"OK {pair['ticker3']}={record[pair['prefix']+'3']:.2f} "
                     f"{pair['ticker4']}={record[pair['prefix']+'4']:.2f} "
-                    f"relação={record['ratio']:.4f}"
+                    f"relação {pair['ratio_label']}={record['ratio']:.4f}"
                 )
             except Exception as exc:
                 errors.append(f"{pair['prefix'].upper()}: {exc}")
@@ -151,6 +184,7 @@ def main():
                 f"\n{pair['ticker3']} / {pair['ticker4']}: {signal[0]}",
                 signal[1],
                 f"{pair['ticker3']}: R$ {p3:.2f} | {pair['ticker4']}: R$ {p4:.2f}",
+                f"Relação {pair['ratio_label']}: {record['ratio']:.4f}",
             ])
         parts.append(
             f"Coleta: {now.strftime('%d/%m/%Y %H:%M:%S')} (Brasília)"
