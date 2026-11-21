@@ -58,28 +58,33 @@ def fetch_history(ticker):
     return cleaned
 
 
-def weekly_last_close(rows):
-    # Usa o último pregão disponível de cada semana ISO; feriados não quebram a coleta.
+def synchronized_weekly(rows3, rows4):
+    # Compara os dois tickers no mesmo pregão; evita diferenças por falta de negócio em um deles.
+    close3 = {day: close for day, close in rows3}
+    close4 = {day: close for day, close in rows4}
+    common_days = sorted(set(close3) & set(close4))
     weekly = {}
-    for day, close in rows:
+    for day in common_days:
         iso = day.isocalendar()
         key = f"{iso.year}-W{iso.week:02d}"
         old = weekly.get(key)
         if old is None or day.isoformat() > old["date"]:
-            weekly[key] = {"week": key, "date": day.isoformat(), "close": close}
+            weekly[key] = {
+                "week": key,
+                "date": day.isoformat(),
+                "klbn3": close3[day],
+                "klbn4": close4[day],
+            }
     return weekly
-
 
 def main():
     # Só publica o novo arquivo quando os dois tickers retornarem dados válidos.
     raw3 = fetch_history("KLBN3")
     raw4 = fetch_history("KLBN4")
-    w3 = weekly_last_close(raw3)
-    w4 = weekly_last_close(raw4)
-
-    common_weeks = sorted(set(w3) & set(w4))
+    weekly = synchronized_weekly(raw3, raw4)
+    common_weeks = sorted(weekly)
     if len(common_weeks) < 8:
-        raise RuntimeError("Menos de oito semanas em comum entre KLBN3 e KLBN4.")
+        raise RuntimeError("Menos de oito semanas com pregão comum entre KLBN3 e KLBN4.")
 
     existing = {"history": []}
     if DATA_FILE.exists():
@@ -90,16 +95,16 @@ def main():
 
     merged = {row["week"]: row for row in existing.get("history", []) if row.get("week")}
     for week in common_weeks:
-        a, b = w3[week], w4[week]
-        spread = (a["close"] / b["close"] - 1.0) * 100.0
+        row = weekly[week]
+        spread = (row["klbn3"] / row["klbn4"] - 1.0) * 100.0
         merged[week] = {
             "week": week,
-            "date": min(a["date"], b["date"]) if a["date"] == b["date"] else max(a["date"], b["date"]),
-            "klbn3": round(a["close"], 4),
-            "klbn4": round(b["close"], 4),
+            "date": row["date"],
+            "klbn3": round(row["klbn3"], 4),
+            "klbn4": round(row["klbn4"], 4),
             "spread_pct": round(spread, 4),
-            "klbn3_date": a["date"],
-            "klbn4_date": b["date"],
+            "klbn3_date": row["date"],
+            "klbn4_date": row["date"],
         }
 
     history = sorted(merged.values(), key=lambda row: row["week"])
