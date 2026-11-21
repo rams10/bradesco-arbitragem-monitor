@@ -1,5 +1,5 @@
 
-name: BBDC3/BBDC4 monitor
+name: Monitor BBDC, SAPR e KLBN
 
 on:
   schedule:
