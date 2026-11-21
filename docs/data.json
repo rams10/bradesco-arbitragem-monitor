@@ -17,5 +17,99 @@
       "quote_time4": "2026-11-20T21:30:30.000Z"
     }
   ],
-  "last_signal": null
+  "last_signal": null,
+  "klbn_history": [
+    {
+      "date": "2026-08-28",
+      "klbn3": 3.85,
+      "klbn4": 3.75,
+      "ratio": 1.02666667,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-09-04",
+      "klbn3": 4.03,
+      "klbn4": 3.85,
+      "ratio": 1.04675325,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-09-11",
+      "klbn3": 4.08,
+      "klbn4": 3.85,
+      "ratio": 1.05974026,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-09-18",
+      "klbn3": 4.05,
+      "klbn4": 3.86,
+      "ratio": 1.0492228,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-09-25",
+      "klbn3": 3.79,
+      "klbn4": 3.58,
+      "ratio": 1.05865922,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-10-02",
+      "klbn3": 3.8,
+      "klbn4": 3.69,
+      "ratio": 1.0298103,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-10-09",
+      "klbn3": 3.74,
+      "klbn4": 3.63,
+      "ratio": 1.03030303,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-10-16",
+      "klbn3": 3.7,
+      "klbn4": 3.61,
+      "ratio": 1.02493075,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-10-23",
+      "klbn3": 3.7,
+      "klbn4": 3.62,
+      "ratio": 1.02209945,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-10-30",
+      "klbn3": 3.56,
+      "klbn4": 3.41,
+      "ratio": 1.04398827,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-11-06",
+      "klbn3": 3.64,
+      "klbn4": 3.49,
+      "ratio": 1.04297994,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-11-13",
+      "klbn3": 3.59,
+      "klbn4": 3.46,
+      "ratio": 1.03757225,
+      "source_frequency": "weekly"
+    },
+    {
+      "date": "2026-11-19",
+      "klbn3": 3.42,
+      "klbn4": 3.34,
+      "ratio": 1.0239521,
+      "source_frequency": "weekly"
+    }
+  ],
+  "klbn_last_signal": null
 }
