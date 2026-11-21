@@ -2,6 +2,13 @@
 name: Monitor BBDC, SAPR e KLBN
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "monitor.py"
+      - "docs/index.html"
+      - ".github/workflows/monitor.yml"
   schedule:
     - cron: "7,37 13-20 * * 1-5"
   workflow_dispatch:
