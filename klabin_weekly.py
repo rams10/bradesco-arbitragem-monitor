@@ -65,7 +65,7 @@ def weekly_last_close(rows):
         iso = day.isocalendar()
         key = f"{iso.year}-W{iso.week:02d}"
         old = weekly.get(key)
-        if old is None or day > old["date"]:
+        if old is None or day.isoformat() > old["date"]:
             weekly[key] = {"week": key, "date": day.isoformat(), "close": close}
     return weekly
 
