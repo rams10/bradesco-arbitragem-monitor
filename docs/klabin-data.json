@@ -1,6 +1,6 @@
 {
   "source": "brapi.dev",
-  "updated_at": "2026-11-21T22:40:08Z",
+  "updated_at": "2026-11-21T22:41:20Z",
   "frequency": "weekly",
   "weekly_method": "last available trading close in each ISO week",
   "initial_history_limit": "3 months on the free brapi plan; the stored weekly series accumulates over time",
