@@ -26,11 +26,6 @@
 <div class="card chart"><div class="label">Histórico da relação SAPR4 / SAPR3</div><canvas id="saprChart"></canvas></div>
 <p class="note">Os limites iniciais da Sanepar (0,88 e 1,05) correspondem, aproximadamente, ao 1º e ao 3º quartis da relação anual SAPR4/SAPR3 entre 2017 e 2026. São parâmetros provisórios baseados em dez fechamentos anuais, ainda sem backtest diário. Abaixo do limite inferior, SAPR4 fica relativamente barata; acima do superior, SAPR4 fica relativamente cara.</p>
 
-<h2>Klabin · histórico de preços KLBN3 x KLBN4</h2>
-<div class="card chart"><div class="label">Fechamento anual em R$ · base atual de ações</div><canvas id="klbnChart"></canvas></div>
-<p class="note">Todos os anos permanecem no gráfico. Os pontos vermelhos indicam anos em que a diferença absoluta entre KLBN3 e KLBN4 superou 50%; esses anos não entram no cálculo da média/mediana, mas não foram apagados da série. Nos 16 anos restantes, o prêmio médio da KLBN3 foi de 9,27% e a mediana de 3,42%. Anos destacados: 2007 (+167,7%), 2015 (+126,3%), 2016 (+115,8%), 2017 (+59,7%) e 2018 (+53,7%). Preços ajustados para desdobramentos/bonificações até a base atual, sem reinvestimento de dividendos; 2026 até 19/11.</p>
-<p class="note links">Fonte histórica: <a href="https://www.cotab3.com.br/cotacao/KLBN3" target="_blank" rel="noopener">KLBN3</a> e <a href="https://www.cotab3.com.br/cotacao/KLBN4F" target="_blank" rel="noopener">KLBN4 (série consultada como KLBN4F)</a>, Cota B3.</p>
-
 <p class="foot">Consultas programadas aproximadamente a cada 30 minutos em dias úteis. O GitHub Actions pode atrasar a execução. A brapi gratuita tem atraso aproximado de 30 minutos e limite de 15 mil requisições por mês. O painel não envia ordens. Confira os preços executáveis no home broker, spread, custos, impostos, liquidez, proventos, direitos de cada classe e datas-com antes de qualquer troca.</p>
 </main><script>
 const money=x=>Number(x).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),fmt=x=>Number(x).toFixed(4).replace('.',',');
@@ -52,10 +47,5 @@ async function load(){try{
  renderPair(d,{history:'history',key3:'bbdc3',key4:'bbdc4',t3:'BBDC3',t4:'BBDC4',lower:1.07,upper:1.13,chart:'monitorChart',ids:{p3:'p3',p4:'p4',ratio:'ratio',signal:'signal',zone:'zone',title:'sigtitle',desc:'sigdesc',updated:'updated',canvas:'chart'}});
  renderPair(d,{history:'sapr_history',key3:'sapr3',key4:'sapr4',t3:'SAPR3',t4:'SAPR4',lower:.88,upper:1.05,chart:'saprMonitorChart',ids:{p3:'sapr3',p4:'sapr4',ratio:'saprRatio',signal:'saprSignal',zone:'saprZone',title:'saprSigtitle',desc:'saprSigdesc',updated:'saprUpdated',canvas:'saprChart'}});
  }catch(e){document.getElementById('sigtitle').textContent=e.message}}
-const klbnYears=[2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
-const klbn3=[1.58,3.56,.99,1.07,1.23,1.38,2.44,2.18,3.25,8.42,6.00,5.00,4.35,4.22,5.34,5.57,3.99,4.38,4.92,3.81,3.42];
-const klbn4=[1.06,1.33,.66,1.01,1.19,1.52,2.52,2.39,2.87,3.72,2.78,3.13,2.83,3.54,5.16,4.98,3.96,4.39,4.51,3.76,3.34];
-const klbnOutliers=new Set([2007,2015,2016,2017,2018]);
-new Chart(document.getElementById('klbnChart'),{type:'line',data:{labels:klbnYears,datasets:[{label:'KLBN3',data:klbn3,borderColor:'#7eb6ff',pointRadius:klbnYears.map(y=>klbnOutliers.has(y)?4:2),pointBackgroundColor:klbnYears.map(y=>klbnOutliers.has(y)?'#ff737d':'#7eb6ff'),tension:.18},{label:'KLBN4',data:klbn4,borderColor:'#36c98f',pointRadius:klbnYears.map(y=>klbnOutliers.has(y)?4:2),pointBackgroundColor:klbnYears.map(y=>klbnOutliers.has(y)?'#ff737d':'#36c98f'),tension:.18}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#bac8da'}}},scales:{x:{ticks:{color:'#9aabc2',maxTicksLimit:11},grid:{color:'#263750'}},y:{title:{display:true,text:'Preço em R$',color:'#9aabc2'},ticks:{color:'#9aabc2'},grid:{color:'#263750'}}}}});
 load();setInterval(load,60000);
 </script></body></html>
