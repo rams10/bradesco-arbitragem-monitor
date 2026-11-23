@@ -15,9 +15,28 @@
       "ratio": 1.085557299843014,
       "quote_time3": "2026-11-20T21:30:30.000Z",
       "quote_time4": "2026-11-20T21:30:30.000Z"
+    },
+    {
+      "captured_at": "2026-11-23T13:02:08.109946-03:00",
+      "bbdc3": 12.74,
+      "bbdc4": 13.82,
+      "ratio": 1.0847723704866563,
+      "ratio_label": "BBDC4 / BBDC3",
+      "quote_time3": "2026-11-23T16:00:30.000Z",
+      "quote_time4": "2026-11-23T16:00:30.000Z"
     }
   ],
-  "last_signal": null,
+  "sapr_history": [
+    {
+      "captured_at": "2026-11-23T13:02:08.109946-03:00",
+      "sapr3": 7.29,
+      "sapr4": 6.57,
+      "ratio": 0.9012345679012346,
+      "ratio_label": "SAPR4 / SAPR3",
+      "quote_time3": "2026-11-23T16:01:30.000Z",
+      "quote_time4": "2026-11-23T16:01:30.000Z"
+    }
+  ],
   "klbn_history": [
     {
       "date": "2026-08-28",
@@ -109,7 +128,35 @@
       "klbn4": 3.34,
       "ratio": 1.0239521,
       "source_frequency": "weekly"
+    },
+    {
+      "captured_at": "2026-11-23T13:02:08.109946-03:00",
+      "klbn3": 3.38,
+      "klbn4": 3.32,
+      "ratio": 1.0180722891566265,
+      "ratio_label": "KLBN3 / KLBN4",
+      "quote_time3": "2026-11-23T16:00:30.000Z",
+      "quote_time4": "2026-11-23T16:00:30.000Z"
     }
   ],
-  "klbn_last_signal": null
+  "last_signal": null,
+  "sapr_last_signal": null,
+  "klbn_last_signal": null,
+  "pair_status": {
+    "bbdc": {
+      "status": "ok",
+      "checked_at": "2026-11-23T13:02:08.109946-03:00",
+      "ratio": 1.0847723704866563
+    },
+    "sapr": {
+      "status": "ok",
+      "checked_at": "2026-11-23T13:02:08.109946-03:00",
+      "ratio": 0.9012345679012346
+    },
+    "klbn": {
+      "status": "ok",
+      "checked_at": "2026-11-23T13:02:08.109946-03:00",
+      "ratio": 1.0180722891566265
+    }
+  }
 }
