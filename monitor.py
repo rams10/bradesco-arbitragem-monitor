@@ -139,6 +139,7 @@ def main():
     alerts, successes, errors = [], [], []
     headers = {"Authorization": f"Bearer {os.environ['BRAPI_TOKEN']}"}
 
+    # Execução automática e também sob demanda pelo GitHub Actions.
     # Plano gratuito: um ticker por chamada. São seis chamadas por coleta:
     # BBDC3/4, SAPR3/4 e KLBN3/4.
     with httpx.Client(timeout=25, headers=headers) as client:
