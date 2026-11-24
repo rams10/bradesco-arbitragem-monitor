@@ -10,7 +10,8 @@ on:
       - "docs/index.html"
       - ".github/workflows/monitor.yml"
   schedule:
-    - cron: "7,37 13-20 * * 1-5"
+    - cron: "7,37 10-17 * * 1-5"
+      timezone: "America/Recife"
   workflow_dispatch:
 
 permissions:
