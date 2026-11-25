@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: klabin-weekly
+  group: brapi-market-data-publish
   cancel-in-progress: false
 
 jobs:
@@ -45,6 +45,7 @@ jobs:
           git add docs/klabin-data.json
           if ! git diff --cached --quiet; then
             git commit -m "Atualiza histórico semanal KLBN3/KLBN4"
+            git pull --rebase origin main
             git push
           else
             echo "Histórico semanal sem alterações."
