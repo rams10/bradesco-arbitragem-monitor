@@ -1,6 +1,6 @@
 {
   "source": "brapi.dev",
-  "updated_at": "2026-11-21T22:41:20Z",
+  "updated_at": "2026-11-25T21:22:28Z",
   "frequency": "weekly",
   "weekly_method": "last available trading close in each ISO week",
   "initial_history_limit": "3 months on the free brapi plan; the stored weekly series accumulates over time",
@@ -122,12 +122,21 @@
       "spread_pct": 2.3952,
       "klbn3_date": "2026-11-19",
       "klbn4_date": "2026-11-19"
+    },
+    {
+      "week": "2026-W48",
+      "date": "2026-11-25",
+      "klbn3": 3.43,
+      "klbn4": 3.35,
+      "spread_pct": 2.3881,
+      "klbn3_date": "2026-11-25",
+      "klbn4_date": "2026-11-25"
     }
   ],
   "last_run": {
-    "weeks_received": 13,
-    "total_weeks": 13,
-    "latest_week": "2026-W47",
-    "latest_date": "2026-11-19"
+    "weeks_received": 14,
+    "total_weeks": 14,
+    "latest_week": "2026-W48",
+    "latest_date": "2026-11-25"
   }
 }
