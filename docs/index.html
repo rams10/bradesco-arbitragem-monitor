@@ -36,7 +36,7 @@
 <div class="card chart"><div class="label">Histórico da relação KLBN3 / KLBN4</div><canvas id="klbnChart"></canvas></div>
 <p class="note">A relação é KLBN3 ÷ KLBN4. Acima de 1,05, KLBN3 está mais de 5% cara que KLBN4; abaixo de 0,95, KLBN3 está mais de 5% barata. Os alertas do Telegram são enviados quando a relação cruza esses limites. O gráfico começa com as observações semanais já coletadas e passa a receber novas observações a cada execução de meia em meia hora.</p>
 
-<p class="foot">Consultas programadas aproximadamente a cada 30 minutos em dias úteis. O GitHub Actions pode atrasar a execução. A brapi gratuita tem atraso aproximado de 30 minutos e limite de 15 mil requisições por mês. O painel não envia ordens. Confira os preços executáveis no home broker, spread, custos, impostos, liquidez, proventos, direitos de cada classe e datas-com antes de qualquer troca.</p>
+<p class="foot">Consultas programadas aproximadamente a cada 30 minutos em dias úteis, com uma coleta final após o call de fechamento da B3. O GitHub Actions pode atrasar a execução. Se a coleta chegar tarde, o último preço aparece identificado como fotografia defasada e nenhum alerta é enviado. A brapi gratuita pode ter atraso aproximado de 30 minutos e limite de 15 mil requisições por mês. O painel não envia ordens. Confira os preços executáveis no home broker, spread, custos, impostos, liquidez, proventos, direitos de cada classe e datas-com antes de qualquer troca.</p>
 </main><script>
 const money=x=>Number(x).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),fmt=x=>Number(x).toFixed(4).replace('.',',');
 function renderPair(d,cfg){
@@ -46,10 +46,12 @@ function renderPair(d,cfg){
  const quoteLabel=(stamp,fallback)=>stamp?new Date(stamp).toLocaleString('pt-BR'):fallback||'—';
  if(!q){put(cfg.ids.title,'Aguardando primeira coleta do par.');return}
  put(cfg.ids.p3,money(q[cfg.key3]));put(cfg.ids.p4,money(q[cfg.key4]));put(cfg.ids.ratio,fmt(q.ratio));
- put(cfg.ids.updated,'Coleta: '+quoteLabel(q.captured_at,q.date)+' · '+cfg.t3+': '+quoteLabel(q.quote_time3,q.date)+' · '+cfg.t4+': '+quoteLabel(q.quote_time4,q.date));
+ const staleNote=q.quote_stale?' · FOTOGRAFIA DEFASADA — sem alertas automáticos':'';
+ put(cfg.ids.updated,'Coleta: '+quoteLabel(q.captured_at,q.date)+' · '+cfg.t3+': '+quoteLabel(q.quote_time3,q.date)+' · '+cfg.t4+': '+quoteLabel(q.quote_time4,q.date)+staleNote);
  const el=document.getElementById(cfg.ids.signal);
  const lowCheap=cfg.invertSignal?cfg.t3:cfg.t4,highCheap=cfg.invertSignal?cfg.t4:cfg.t3;
- if(q.ratio<=cfg.lower){el.className='signal good';put(cfg.ids.zone,'AVALIAR '+lowCheap);put(cfg.ids.title,lowCheap+' relativamente barata');put(cfg.ids.desc,'Relação no limite inferior ou abaixo de '+fmt(cfg.lower)+'. Avalie '+highCheap+' → '+lowCheap+'.')}
+ if(q.quote_stale){el.className='signal neutral';put(cfg.ids.zone,'COTAÇÃO DEFASADA');put(cfg.ids.title,'Último preço disponível; sinais suspensos');put(cfg.ids.desc,'A execução atrasou. A relação exibida é apenas uma fotografia do último preço negociado; aguarde cotação recente antes de avaliar qualquer troca.')}
+ else if(q.ratio<=cfg.lower){el.className='signal good';put(cfg.ids.zone,'AVALIAR '+lowCheap);put(cfg.ids.title,lowCheap+' relativamente barata');put(cfg.ids.desc,'Relação no limite inferior ou abaixo de '+fmt(cfg.lower)+'. Avalie '+highCheap+' → '+lowCheap+'.')}
  else if(q.ratio>=cfg.upper){el.className='signal bad';put(cfg.ids.zone,'AVALIAR '+highCheap);put(cfg.ids.title,highCheap+' relativamente barata');put(cfg.ids.desc,'Relação no limite superior ou acima de '+fmt(cfg.upper)+'. Avalie '+lowCheap+' → '+highCheap+'.')}
  else{el.className='signal neutral';put(cfg.ids.zone,'ZONA NEUTRA');put(cfg.ids.title,'Aguardar');put(cfg.ids.desc,'Relação entre '+fmt(cfg.lower)+' e '+fmt(cfg.upper)+'.')}
  if(window[cfg.chart])window[cfg.chart].destroy();
