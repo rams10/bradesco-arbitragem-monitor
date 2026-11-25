@@ -9,7 +9,9 @@ on:
       - ".github/workflows/klabin-weekly.yml"
       - "docs/klabin.html"
   schedule:
-    - cron: "30 21 * * 5" # Sexta-feira, 18h30 de Brasília (após o fechamento)
+    # Sexta-feira às 18h35 de Recife, após o call de fechamento da B3.
+    - cron: "35 18 * * 5"
+      timezone: "America/Recife"
   workflow_dispatch:
 
 permissions:
