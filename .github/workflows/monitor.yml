@@ -10,10 +10,13 @@ on:
       - "docs/index.html"
       - ".github/workflows/monitor.yml"
   schedule:
-    - cron: "7,37 10-17 * * 1-5"
+    # Checagem inicial às 10h30; depois, a cada 30 minutos até 17h30.
+    - cron: "30 10 * * 1-5"
       timezone: "America/Recife"
-    # Fotografia final depois do call de fechamento da B3 (17h55–18h00).
-    - cron: "12 18 * * 1-5"
+    - cron: "0,30 11-17 * * 1-5"
+      timezone: "America/Recife"
+    # Fotografia final com 30 minutos de margem após o fechamento da B3.
+    - cron: "30 18 * * 1-5"
       timezone: "America/Recife"
   workflow_dispatch:
 
