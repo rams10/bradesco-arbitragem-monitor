@@ -60,19 +60,35 @@ def get_quote(client, ticker, now):
     quote_dt = datetime.datetime.fromisoformat(
         quote_time.replace("Z", "+00:00")
     ).astimezone(TZ)
-    if abs((now - quote_dt).total_seconds()) > 90 * 60:
+    age_seconds = abs((now - quote_dt).total_seconds())
+    stale = age_seconds > 90 * 60
+
+    # O agendador do GitHub pode atrasar horas. Após o fechamento, ainda
+    # publicamos o último preço negociado do mesmo pregão como fotografia
+    # defasada, mas esse dado NUNCA pode disparar alerta do Telegram.
+    same_day_after_close = (
+        quote_dt.date() == now.date()
+        and now.time() >= datetime.time(18, 0)
+    )
+    overnight_previous_session = (
+        now.time() < datetime.time(9, 30)
+        and quote_dt.date() == now.date() - datetime.timedelta(days=1)
+        and age_seconds <= 16 * 60 * 60
+    )
+    if stale and not (same_day_after_close or overnight_previous_session):
         raise RuntimeError(f"Cotação de {ticker} antiga demais; sinal suspenso.")
-    return price, quote_time, quote_dt
+    return price, quote_time, quote_dt, stale
 
 
 def collect_pair(client, old, pair, now):
     ticker3, ticker4 = pair["ticker3"], pair["ticker4"]
-    p3, t3, d3 = get_quote(client, ticker3, now)
-    p4, t4, d4 = get_quote(client, ticker4, now)
+    p3, t3, d3, stale3 = get_quote(client, ticker3, now)
+    p4, t4, d4, stale4 = get_quote(client, ticker4, now)
     if abs((d3 - d4).total_seconds()) > 30 * 60:
         raise RuntimeError(
             f"Horários das cotações de {ticker3} e {ticker4} muito diferentes."
         )
+    stale_snapshot = stale3 or stale4
 
     if pair["ratio_numerator"] == "4":
         numerator, denominator = p4, p3
@@ -85,7 +101,9 @@ def collect_pair(client, old, pair, now):
     history = old.get(pair["history_key"], [])
     previous = history[-1]["ratio"] if history else None
     signal = None
-    if previous is not None:
+    # Cotação defasada pode atualizar o histórico visual, mas jamais gerar
+    # sinal ou notificação de negociação.
+    if previous is not None and not stale_snapshot:
         if previous > pair["lower"] and ratio <= pair["lower"]:
             signal = (
                 f"{numerator_ticker} relativamente barata",
@@ -109,9 +127,10 @@ def collect_pair(client, old, pair, now):
         "ratio_label": pair["ratio_label"],
         "quote_time3": t3,
         "quote_time4": t4,
+        "quote_stale": stale_snapshot,
     }
     history.append(record)
-    return history[-2000:], signal, record
+    return history[-2000:], signal, record, stale_snapshot
 
 
 def main():
@@ -145,19 +164,24 @@ def main():
     with httpx.Client(timeout=25, headers=headers) as client:
         for pair in PAIRS:
             try:
-                history, signal, record = collect_pair(client, old, pair, now)
+                history, signal, record, stale_snapshot = collect_pair(client, old, pair, now)
                 result[pair["history_key"]] = history
-                if signal:
+                if signal and not stale_snapshot:
                     result[pair["signal_key"]] = signal[0]
                     alerts.append((pair, signal, record))
                 result["pair_status"][pair["prefix"]] = {
-                    "status": "ok",
+                    "status": "stale" if stale_snapshot else "ok",
                     "checked_at": now.isoformat(),
                     "ratio": record["ratio"],
+                    "message": (
+                        "Fotografia tardia do último preço; alertas suspensos."
+                        if stale_snapshot else ""
+                    ),
                 }
                 successes.append(pair["prefix"])
+                prefix = "FOTOGRAFIA (sem alertas)" if stale_snapshot else "OK"
                 print(
-                    f"OK {pair['ticker3']}={record[pair['prefix']+'3']:.2f} "
+                    f"{prefix} {pair['ticker3']}={record[pair['prefix']+'3']:.2f} "
                     f"{pair['ticker4']}={record[pair['prefix']+'4']:.2f} "
                     f"relação {pair['ratio_label']}={record['ratio']:.4f}"
                 )
