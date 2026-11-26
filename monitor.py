@@ -226,15 +226,32 @@ def main():
             "Sinal relativo; confira preços executáveis, spread, custos, "
             "impostos, liquidez e proventos antes de operar."
         )
-        with httpx.Client(timeout=20) as client:
-            sent = client.post(
-                f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
-                json={
-                    "chat_id": os.environ["TELEGRAM_CHAT_ID"],
-                    "text": "\n".join(parts),
-                },
+        # Falhas no Telegram não podem impedir a gravação/publicação dos preços.
+        try:
+            with httpx.Client(timeout=20) as client:
+                sent = client.post(
+                    f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
+                    json={
+                        "chat_id": os.environ["TELEGRAM_CHAT_ID"],
+                        "text": "\n".join(parts),
+                    },
+                )
+                if sent.is_success:
+                    payload = sent.json()
+                    if payload.get("ok"):
+                        print("Alerta enviado ao Telegram com sucesso.")
+                    else:
+                        print(f"Telegram recusou o alerta: {payload}")
+                else:
+                    print(
+                        "Falha no Telegram (não bloqueia a atualização do site): "
+                        f"HTTP {sent.status_code} — {sent.text[:1000]}"
+                    )
+        except Exception as exc:
+            print(
+                "Erro de comunicação com Telegram (não bloqueia a atualização do site): "
+                f"{type(exc).__name__}: {exc}"
             )
-            sent.raise_for_status()
 
     print(json.dumps({
         "successes": successes,
