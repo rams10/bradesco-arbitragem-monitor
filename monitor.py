@@ -133,6 +133,7 @@ def collect_pair(client, old, pair, now):
     return history[-2000:], signal, record, stale_snapshot
 
 
+# Coleta manual para revalidar BBDC, SAPR e KLBN após ausência da execução agendada de 26/11/2026.
 def main():
     now = datetime.datetime.now(TZ)
     old = {
