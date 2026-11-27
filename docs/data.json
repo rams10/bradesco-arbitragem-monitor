@@ -103,6 +103,16 @@
       "quote_time3": "2026-11-27T21:31:30.000Z",
       "quote_time4": "2026-11-27T21:31:30.000Z",
       "quote_stale": false
+    },
+    {
+      "captured_at": "2026-11-27T19:29:48.337305-03:00",
+      "bbdc3": 14.51,
+      "bbdc4": 16.07,
+      "ratio": 1.107512060647829,
+      "ratio_label": "BBDC4 / BBDC3",
+      "quote_time3": "2026-11-27T21:31:30.000Z",
+      "quote_time4": "2026-11-27T21:31:30.000Z",
+      "quote_stale": false
     }
   ],
   "sapr_history": [
@@ -186,6 +196,16 @@
     },
     {
       "captured_at": "2026-11-27T19:13:47.832030-03:00",
+      "sapr3": 8.01,
+      "sapr4": 6.83,
+      "ratio": 0.8526841448189764,
+      "ratio_label": "SAPR4 / SAPR3",
+      "quote_time3": "2026-11-27T21:31:30.000Z",
+      "quote_time4": "2026-11-27T21:31:30.000Z",
+      "quote_stale": false
+    },
+    {
+      "captured_at": "2026-11-27T19:29:48.337305-03:00",
       "sapr3": 8.01,
       "sapr4": 6.83,
       "ratio": 0.8526841448189764,
@@ -374,6 +394,16 @@
       "quote_time3": "2026-11-27T21:31:30.000Z",
       "quote_time4": "2026-11-27T21:31:30.000Z",
       "quote_stale": false
+    },
+    {
+      "captured_at": "2026-11-27T19:29:48.337305-03:00",
+      "klbn3": 3.45,
+      "klbn4": 3.36,
+      "ratio": 1.0267857142857144,
+      "ratio_label": "KLBN3 / KLBN4",
+      "quote_time3": "2026-11-27T21:31:30.000Z",
+      "quote_time4": "2026-11-27T21:31:30.000Z",
+      "quote_stale": false
     }
   ],
   "last_signal": null,
@@ -382,19 +412,19 @@
   "pair_status": {
     "bbdc": {
       "status": "ok",
-      "checked_at": "2026-11-27T19:13:47.832030-03:00",
+      "checked_at": "2026-11-27T19:29:48.337305-03:00",
       "ratio": 1.107512060647829,
       "message": ""
     },
     "sapr": {
       "status": "ok",
-      "checked_at": "2026-11-27T19:13:47.832030-03:00",
+      "checked_at": "2026-11-27T19:29:48.337305-03:00",
       "ratio": 0.8526841448189764,
       "message": ""
     },
     "klbn": {
       "status": "ok",
-      "checked_at": "2026-11-27T19:13:47.832030-03:00",
+      "checked_at": "2026-11-27T19:29:48.337305-03:00",
       "ratio": 1.0267857142857144,
       "message": ""
     }
